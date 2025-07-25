@@ -63,7 +63,10 @@
       background-color: green;
       color: white;
     }
-    /* Borde amarillo grueso para la última carta revelada */
+    .card.consuelo {
+      background-color: #b89b74;
+      color: white;
+    }
     .card.ultima-revelada {
       border: 4px solid yellow;
       box-sizing: border-box;
@@ -113,6 +116,12 @@
         <input id="premio1" type="text" placeholder="Premio Especial 1" />
         <input id="premio2" type="text" placeholder="Premio Especial 2" />
         <input id="premio3" type="text" placeholder="Premio Especial 3" />
+        <input id="premio4" type="text" placeholder="Premio Consuelo 1" />
+        <input id="premio5" type="text" placeholder="Premio Consuelo 2" />
+        <input id="premio6" type="text" placeholder="Premio Consuelo 3" />
+        <input id="premio7" type="text" placeholder="Premio Consuelo 4" />
+        <input id="premio8" type="text" placeholder="Premio Consuelo 5" />
+        <input id="premio9" type="text" placeholder="Premio Consuelo 6" />
         <button onclick="mezclar()">Mezclar</button>
       </div>
       <div id="premios"></div>
@@ -131,38 +140,49 @@
     let puedeRevelar = true;
     let cartasReveladas = [];
     let ultimaCartaReveladaIndex = null;
+    const premiosPorDefecto = [
+  	"Ruleta 🎡🛞🎡",
+  	"Champagne 🍾",
+  	"Champagne 🍾",
+  	"Pack Cerveza 🍻",
+  	"Chocolatito 🍫",
+  	"Chocolatito 🍫",
+  	"Chocolatito 🍫",
+  	"Chocolatito 🍫",
+  	"Chocolatito 🍫",
+  	"Chocolatito 🍫"
+    ];
+
 
     const frasesArgentinas = [
-      "Qué mirás bobo, andá pa' allá",
-      "Siempre te faltan 5 pa’l peso",
-      "Me cortaron las piernas",
-      "Lo dejo a tu criterio",
-      "Estamos mal pero vamos bien",
-      "Segurola y Habana",
-      "No se inunda más",
-      "Permitime que te diga algo",
-      "É un escándalo",
-      "Es una lucha",
-      "Cobani",
-      "Y se la llevó el viento",
-      "Yo no fui, fue Teté",
-      "Se cayó el sistema",
-      "¿Y si probamos con amor?",
-      "No me arrepiento de este amor",
-      "La tenés adentro",
-      "El que abandona no tiene premio",
-      "La pelota no se mancha",
-      "Vos no entendés el juego",
-      "A veces me equivoco y pido perdón",
-      "Te lo resumo así nomás",
-      "Me quieren ver muerto, pero bien muerto",
-      "Andate a dormir vos",
-      "Tranquilo Nene",
-      "Estoy feliz, feliz, feliz",
-      "Gracias Diego por tanto",
-      "Jugamos como nunca, perdimos como siempre",
-      "Esto es mucho para mí",
-      "Naaa, dejate de joder"
+	"Qué mirás bobo, andá pa' allá", 
+	"Te cortaron las piernas", 
+	"Se te escapó la tortuga", 
+	"Siempre te faltan 5 pal’ peso", 
+	"Era por abajo, Palacio", 
+	"Estamos mal pero vamos bien", 
+	"Si querés llorar, llorá", 
+	"Andá a cantarle a Gardel", 
+	"Te comiste el amague", 
+	"Si te gusta el durazno, bancate la pelusa", 
+	"Que miseria che...3 empanadas", 
+	"Te pusiste el moño", 
+	"Rajemos pichichus", 
+	"Poco yo", 
+	"Te quedaste cortazar", 
+	"Cortina", 
+	"Acusalo con tu mama kiko", 
+	"Regalado", 
+	"No sé nada", 
+	"Otro gato", 
+	"Miauu", 
+	"Y NEGRO???", 
+	"Te encantaría", 
+	"Te gustaría", 
+	"Desconozco", 
+	"Anotado", 
+	"Ya no sé qué hacer con este chico", 
+	"Estás re seco"
     ];
 
     function crearCartas() {
@@ -185,7 +205,9 @@
           card.classList.add("revealed");
           const premioIndex = posicionesPremios.indexOf(index);
           if (premioIndex >= 0) {
-            const tipo = premioIndex === 0 ? "grande" : "medio";
+            let tipo = "medio";
+            if (premioIndex === 0) tipo = "grande";
+            else if (premioIndex >= 4) tipo = "consuelo";
             card.classList.add(tipo);
             card.textContent = premios[premioIndex];
           } else {
@@ -203,14 +225,13 @@
     function mezclar() {
       if (!confirm("¿Estás seguro de que querés reiniciar y mezclar los premios?")) return;
 
-      premios = [
-        document.getElementById("premio0").value.trim(),
-        document.getElementById("premio1").value.trim(),
-        document.getElementById("premio2").value.trim(),
-        document.getElementById("premio3").value.trim()
-      ];
+      premios = [];
+      for (let i = 0; i < 10; i++) {
+        const input = document.getElementById("premio" + i);
+        premios.push(input ? input.value.trim() : "");
+      }
       posicionesPremios = [];
-      while (posicionesPremios.length < 4) {
+      while (posicionesPremios.length < 10) {
         const pos = Math.floor(Math.random() * totalCartas);
         if (!posicionesPremios.includes(pos)) {
           posicionesPremios.push(pos);
@@ -235,7 +256,8 @@
         div.textContent = p;
         div.className = "premio";
         if (i === 0) div.style.color = "red";
-        else div.style.color = "lightgreen";
+        else if (i >= 1 && i <= 3) div.style.color = "lightgreen";
+        else div.style.color = "#b89b74";
         if (posicionesPremios[i] !== undefined && cartasReveladas[posicionesPremios[i]]) {
           div.classList.add("tachado");
         }
@@ -252,12 +274,10 @@
 
       puedeRevelar = false;
 
-      // Quitar borde de la última carta revelada anterior
       if (ultimaCartaReveladaIndex !== null && grid.children[ultimaCartaReveladaIndex]) {
         grid.children[ultimaCartaReveladaIndex].classList.remove("ultima-revelada");
       }
 
-      // Marcar la nueva carta revelada con borde amarillo
       card.classList.add("revealed");
       card.classList.add("ultima-revelada");
       ultimaCartaReveladaIndex = index;
@@ -266,7 +286,9 @@
 
       const premioIndex = posicionesPremios.indexOf(index);
       if (premioIndex >= 0) {
-        const tipo = premioIndex === 0 ? "grande" : "medio";
+        let tipo = "medio";
+        if (premioIndex === 0) tipo = "grande";
+        else if (premioIndex >= 4) tipo = "consuelo";
         card.classList.add(tipo);
         card.textContent = premios[premioIndex];
         const divPremio = premiosDiv.querySelector(`[data-index='${premioIndex}']`);
@@ -285,7 +307,7 @@
 
       setTimeout(() => {
         puedeRevelar = true;
-      }, 500);
+      }, 5000);
     }
 
     function guardarEstado() {
@@ -302,21 +324,21 @@
     }
 
     function guardarPremiosDesdeInputs() {
-      premios = [
-        document.getElementById("premio0").value.trim(),
-        document.getElementById("premio1").value.trim(),
-        document.getElementById("premio2").value.trim(),
-        document.getElementById("premio3").value.trim()
-      ];
+      premios = [];
+      for (let i = 0; i < 10; i++) {
+        const input = document.getElementById("premio" + i);
+        premios.push(input ? input.value.trim() : "");
+      }
       guardarEstado();
       actualizarListaPremios();
     }
 
-    // Agregar event listeners para guardar los premios cuando se editan
-    document.getElementById("premio0").addEventListener("input", guardarPremiosDesdeInputs);
-    document.getElementById("premio1").addEventListener("input", guardarPremiosDesdeInputs);
-    document.getElementById("premio2").addEventListener("input", guardarPremiosDesdeInputs);
-    document.getElementById("premio3").addEventListener("input", guardarPremiosDesdeInputs);
+    for (let i = 0; i < 10; i++) {
+      const input = document.getElementById("premio" + i);
+      if (input) {
+        input.addEventListener("input", guardarPremiosDesdeInputs);
+      }
+    }
 
     function cargarEstado() {
       const estadoJSON = localStorage.getItem("estadoJuego");
@@ -331,18 +353,19 @@
           frasesReveladas = estado.frasesReveladas || Array(totalCartas).fill("");
           ultimaCartaReveladaIndex = estado.ultimaCartaReveladaIndex;
 
-          // Poner los premios guardados en los inputs
-          if (premios && premios.length >= 4) {
-            document.getElementById("premio0").value = premios[0];
-            document.getElementById("premio1").value = premios[1];
-            document.getElementById("premio2").value = premios[2];
-            document.getElementById("premio3").value = premios[3];
-          }
+          if (premios && premios.length >= 10) {
+  		for (let i = 0; i < 10; i++) {
+    		 const input = document.getElementById("premio" + i);
+    		 const premioGuardado = premios[i] && premios[i].trim();
+    		 const premioFinal = premioGuardado || premiosPorDefecto[i];
+    		 premios[i] = premioFinal;
+    		 if (input) input.value = premioFinal;
+  		}
+	}
 
           actualizarListaPremios();
           crearCartasDesdeEstado();
 
-          // Poner borde amarillo a la última carta revelada
           if (
             ultimaCartaReveladaIndex !== null &&
             ultimaCartaReveladaIndex !== -1 &&
@@ -355,7 +378,7 @@
           console.error("Error cargando estado:", e);
         }
       }
-      mezclar(); // si no hay nada guardado, arrancar de cero
+      mezclar();
     }
 
     cargarEstado();
